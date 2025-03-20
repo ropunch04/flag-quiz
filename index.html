@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flag Quiz Game</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .game-screen {
+            padding: 2rem;
+            border-radius: 10px;
+            background-color: #f8f9fa;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        #flag-container {
+            min-height: 240px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #flag-container img {
+            max-width: 100%;
+            max-height: 240px;
+            border: 1px solid #ddd;
+        }
+
+        .correct {
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .incorrect {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .result {
+            color: #17a2b8;
+            font-weight: bold;
+        }
+
+        #country-input {
+            font-size: 1.2rem;
+        }
+
+        #feedback {
+            min-height: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 text-center">
+                <h1 class="mt-5 mb-4">Flag Quiz Game</h1>
+                
+                <!-- Start Screen -->
+                <div id="start-screen" class="game-screen">
+                    <p class="lead mb-5">Test your knowledge of country flags!</p>
+                    <button id="start-button" class="btn btn-primary btn-lg">Start Game</button>
+                </div>
+                
+                <!-- Game Screen -->
+                <div id="game-screen" class="game-screen d-none">
+                    <div class="mb-4">
+                        <div id="flag-container" class="mb-3">
+                            <!-- Flag will be displayed here -->
+                        </div>
+                        
+                        <div class="mb-3">
+                            <p>Guess <span id="current-guess">1</span> of 3</p>
+                        </div>
+                        
+                        <div class="input-group mb-3">
+                            <input type="text" id="country-input" class="form-control" placeholder="Type a country name" list="country-list" autocomplete="off">
+                            <button id="guess-button" class="btn btn-primary">Guess</button>
+                        </div>
+                        
+                        <datalist id="country-list">
+                            <!-- Will be populated by JavaScript -->
+                        </datalist>
+                        
+                        <div id="feedback" class="mt-3 mb-3"></div>
+                        
+                        <button id="next-button" class="btn btn-success d-none">Next Flag</button>
+                    </div>
+                </div>
+                
+                <!-- Result Screen -->
+                <div id="result-screen" class="game-screen d-none">
+                    <div id="result-message" class="mb-4"></div>
+                    <button id="play-again-button" class="btn btn-primary">Play Again</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Country data
+            const countries = [
+                {"name": "Afghanistan", "code": "af"},
+                {"name": "Albania", "code": "al"},
+                {"name": "Algeria", "code": "dz"},
+                {"name": "Andorra", "code": "ad"},
+                {"name": "Angola", "code": "ao"},
+                {"name": "Antigua and Barbuda", "code": "ag"},
+                {"name": "Argentina", "code": "ar"},
+                {"name": "Armenia", "code": "am"},
+                {"name": "Australia", "code": "au"},
+                {"name": "Austria", "code": "at"},
+                {"name": "Azerbaijan", "code": "az"},
+                {"name": "Bahamas", "code": "bs"},
+                {"name": "Bahrain", "code": "bh"},
+                {"name": "Bangladesh", "code": "bd"},
+                {"name": "Barbados", "code": "bb"},
+                {"name": "Belarus", "code": "by"},
+                {"name": "Belgium", "code": "be"},
+                {"name": "Belize", "code": "bz"},
+                {"name": "Benin", "code": "bj"},
+                {"name": "Bhutan", "code": "bt"},
+                {"name": "Bolivia", "code": "bo"},
+                {"name": "Bosnia and Herzegovina", "code": "ba"},
+                {"name": "Botswana", "code": "bw"},
+                {"name": "Brazil", "code": "br"},
+                {"name": "Brunei", "code": "bn"},
+                {"name": "Bulgaria", "code": "bg"},
+                {"name": "Burkina Faso", "code": "bf"},
+                {"name": "Burundi", "code": "bi"},
+                {"name": "Cabo Verde", "code": "cv"},
+                {"name": "Cambodia", "code": "kh"},
+                {"name": "Cameroon", "code": "cm"},
+                {"name": "Canada", "code": "ca"},
+                {"name": "Central African Republic", "code": "cf"},
+                {"name": "Chad", "code": "td"},
+                {"name": "Chile", "code": "cl"},
+                {"name": "China", "code": "cn"},
+                {"name": "Colombia", "code": "co"},
+                {"name": "Comoros", "code": "km"},
+                {"name": "Congo", "code": "cg"},
+                {"name": "Costa Rica", "code": "cr"},
+                {"name": "Croatia", "code": "hr"},
+                {"name": "Cuba", "code": "cu"},
+                {"name": "Cyprus", "code": "cy"},
+                {"name": "Czech Republic", "code": "cz"},
+                {"name": "Denmark", "code": "dk"},
+                {"name": "Djibouti", "code": "dj"},
+                {"name": "Dominica", "code": "dm"},
+                {"name": "Dominican Republic", "code": "do"},
+                {"name": "DR Congo", "code": "cd"},
+                {"name": "Ecuador", "code": "ec"},
+                {"name": "Egypt", "code": "eg"},
+                {"name": "El Salvador", "code": "sv"},
+                {"name": "Equatorial Guinea", "code": "gq"},
+                {"name": "Eritrea", "code": "er"},
+                {"name": "Estonia", "code": "ee"},
+                {"name": "Eswatini", "code": "sz"},
+                {"name": "Ethiopia", "code": "et"},
+                {"name": "Fiji", "code": "fj"},
+                {"name": "Finland", "code": "fi"},
+                {"name": "France", "code": "fr"},
+                {"name": "Gabon", "code": "ga"},
+                {"name": "Gambia", "code": "gm"},
+                {"name": "Georgia", "code": "ge"},
+                {"name": "Germany", "code": "de"},
+                {"name": "Ghana", "code": "gh"},
+                {"name": "Greece", "code": "gr"},
+                {"name": "Grenada", "code": "gd"},
+                {"name": "Guatemala", "code": "gt"},
+                {"name": "Guinea", "code": "gn"},
+                {"name": "Guinea-Bissau", "code": "gw"},
+                {"name": "Guyana", "code": "gy"},
+                {"name": "Haiti", "code": "ht"},
+                {"name": "Honduras", "code": "hn"},
+                {"name": "Hungary", "code": "hu"},
+                {"name": "Iceland", "code": "is"},
+                {"name": "India", "code": "in"},
+                {"name": "Indonesia", "code": "id"},
+                {"name": "Iran", "code": "ir"},
+                {"name": "Iraq", "code": "iq"},
+                {"name": "Ireland", "code": "ie"},
+                {"name": "Israel", "code": "il"},
+                {"name": "Italy", "code": "it"},
+                {"name": "Ivory Coast", "code": "ci"},
+                {"name": "Jamaica", "code": "jm"},
+                {"name": "Japan", "code": "jp"},
+                {"name": "Jordan", "code": "jo"},
+                {"name": "Kazakhstan", "code": "kz"},
+                {"name": "Kenya", "code": "ke"},
+                {"name": "Kiribati", "code": "ki"},
+                {"name": "Kuwait", "code": "kw"},
+                {"name": "Kyrgyzstan", "code": "kg"},
+                {"name": "Laos", "code": "la"},
+                {"name": "Latvia", "code": "lv"},
+                {"name": "Lebanon", "code": "lb"},
+                {"name": "Lesotho", "code": "ls"},
+                {"name": "Liberia", "code": "lr"},
+                {"name": "Libya", "code": "ly"},
+                {"name": "Liechtenstein", "code": "li"},
+                {"name": "Lithuania", "code": "lt"},
+                {"name": "Luxembourg", "code": "lu"},
+                {"name": "Madagascar", "code": "mg"},
+                {"name": "Malawi", "code": "mw"},
+                {"name": "Malaysia", "code": "my"},
+                {"name": "Maldives", "code": "mv"},
+                {"name": "Mali", "code": "ml"},
+                {"name": "Malta", "code": "mt"},
+                {"name": "Marshall Islands", "code": "mh"},
+                {"name": "Mauritania", "code": "mr"},
+                {"name": "Mauritius", "code": "mu"},
+                {"name": "Mexico", "code": "mx"},
+                {"name": "Micronesia", "code": "fm"},
+                {"name": "Moldova", "code": "md"},
+                {"name": "Monaco", "code": "mc"},
+                {"name": "Mongolia", "code": "mn"},
+                {"name": "Montenegro", "code": "me"},
+                {"name": "Morocco", "code": "ma"},
+                {"name": "Mozambique", "code": "mz"},
+                {"name": "Myanmar", "code": "mm"},
+                {"name": "Namibia", "code": "na"},
+                {"name": "Nauru", "code": "nr"},
+                {"name": "Nepal", "code": "np"},
+                {"name": "Netherlands", "code": "nl"},
+                {"name": "New Zealand", "code": "nz"},
+                {"name": "Nicaragua", "code": "ni"},
+                {"name": "Niger", "code": "ne"},
+                {"name": "Nigeria", "code": "ng"},
+                {"name": "North Korea", "code": "kp"},
+                {"name": "North Macedonia", "code": "mk"},
+                {"name": "Norway", "code": "no"},
+                {"name": "Oman", "code": "om"},
+                {"name": "Pakistan", "code": "pk"},
+                {"name": "Palau", "code": "pw"},
+                {"name": "Palestine", "code": "ps"},
+                {"name": "Panama", "code": "pa"},
+                {"name": "Papua New Guinea", "code": "pg"},
+                {"name": "Paraguay", "code": "py"},
+                {"name": "Peru", "code": "pe"},
+                {"name": "Philippines", "code": "ph"},
+                {"name": "Poland", "code": "pl"},
+                {"name": "Portugal", "code": "pt"},
+                {"name": "Qatar", "code": "qa"},
+                {"name": "Romania", "code": "ro"},
+                {"name": "Russia", "code": "ru"},
+                {"name": "Rwanda", "code": "rw"},
+                {"name": "Saint Kitts and Nevis", "code": "kn"},
+                {"name": "Saint Lucia", "code": "lc"},
+                {"name": "Saint Vincent and the Grenadines", "code": "vc"},
+                {"name": "Samoa", "code": "ws"},
+                {"name": "San Marino", "code": "sm"},
+                {"name": "Sao Tome and Principe", "code": "st"},
+                {"name": "Saudi Arabia", "code": "sa"},
+                {"name": "Senegal", "code": "sn"},
+                {"name": "Serbia", "code": "rs"},
+                {"name": "Seychelles", "code": "sc"},
+                {"name": "Sierra Leone", "code": "sl"},
+                {"name": "Singapore", "code": "sg"},
+                {"name": "Slovakia", "code": "sk"},
+                {"name": "Slovenia", "code": "si"},
+                {"name": "Solomon Islands", "code": "sb"},
+                {"name": "Somalia", "code": "so"},
+                {"name": "South Africa", "code": "za"},
+                {"name": "South Korea", "code": "kr"},
+                {"name": "South Sudan", "code": "ss"},
+                {"name": "Spain", "code": "es"},
+                {"name": "Sri Lanka", "code": "lk"},
+                {"name": "Sudan", "code": "sd"},
+                {"name": "Suriname", "code": "sr"},
+                {"name": "Sweden", "code": "se"},
+                {"name": "Switzerland", "code": "ch"},
+                {"name": "Syria", "code": "sy"},
+                {"name": "Taiwan", "code": "tw"},
+                {"name": "Tajikistan", "code": "tj"},
+                {"name": "Tanzania", "code": "tz"},
+                {"name": "Thailand", "code": "th"},
+                {"name": "Timor-Leste", "code": "tl"},
+                {"name": "Togo", "code": "tg"},
+                {"name": "Tonga", "code": "to"},
+                {"name": "Trinidad and Tobago", "code": "tt"},
+                {"name": "Tunisia", "code": "tn"},
+                {"name": "Turkey", "code": "tr"},
+                {"name": "Turkmenistan", "code": "tm"},
+                {"name": "Tuvalu", "code": "tv"},
+                {"name": "Uganda", "code": "ug"},
+                {"name": "Ukraine", "code": "ua"},
+                {"name": "United Arab Emirates", "code": "ae"},
+                {"name": "United Kingdom", "code": "gb"},
+                {"name": "United States", "code": "us"},
+                {"name": "Uruguay", "code": "uy"},
+                {"name": "Uzbekistan", "code": "uz"},
+                {"name": "Vanuatu", "code": "vu"},
+                {"name": "Vatican City", "code": "va"},
+                {"name": "Venezuela", "code": "ve"},
+                {"name": "Vietnam", "code": "vn"},
+                {"name": "Yemen", "code": "ye"},
+                {"name": "Zambia", "code": "zm"},
+                {"name": "Zimbabwe", "code": "zw"}
+            ];
+
+            // Game elements
+            const startScreen = document.getElementById('start-screen');
+            const gameScreen = document.getElementById('game-screen');
+            const resultScreen = document.getElementById('result-screen');
+            const startButton = document.getElementById('start-button');
+            const flagContainer = document.getElementById('flag-container');
+            const countryInput = document.getElementById('country-input');
+            const guessButton = document.getElementById('guess-button');
+            const nextButton = document.getElementById('next-button');
+            const playAgainButton = document.getElementById('play-again-button');
+            const feedback = document.getElementById('feedback');
+            const currentGuessSpan = document.getElementById('current-guess');
+            const resultMessage = document.getElementById('result-message');
+            const countryList = document.getElementById('country-list');
+
+            // Populate country datalist
+            countries.forEach(country => {
+                const option = document.createElement('option');
+                option.value = country.name;
+                countryList.appendChild(option);
+            });
+
+            // Game state
+            let currentCountry = null;
+            let guessCount = 0;
+            let maxGuesses = 3;
+            let validCountries = countries.map(country => country.name.toLowerCase());
+
+            // Event listeners
+            startButton.addEventListener('click', startGame);
+            guessButton.addEventListener('click', submitGuess);
+            nextButton.addEventListener('click', loadNextFlag);
+            playAgainButton.addEventListener('click', startGame);
+            countryInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    submitGuess();
+                }
+            });
+
+            // Start the game
+            function startGame() {
+                startScreen.classList.add('d-none');
+                resultScreen.classList.add('d-none');
+                gameScreen.classList.remove('d-none');
+                loadNextFlag();
+            }
+
+            // Load a new flag
+            function loadNextFlag() {
+                // Reset game state
+                guessCount = 0;
+                currentGuessSpan.textContent = '1';
+                countryInput.value = '';
+                feedback.innerHTML = '';
+                nextButton.classList.add('d-none');
+                
+                // Enable guess controls
+                countryInput.disabled = false;
+                guessButton.disabled = false;
+                
+                // Get a random country
+                currentCountry = countries[Math.floor(Math.random() * countries.length)];
+                displayFlag(currentCountry.code);
+            }
+
+            // Display the flag image
+            function displayFlag(countryCode) {
+                flagContainer.innerHTML = `
+                    <img 
+                        src="https://flagcdn.com/256x192/${countryCode}.png"
+                        srcset="https://flagcdn.com/512x384/${countryCode}.png 2x,
+                            https://flagcdn.com/768x576/${countryCode}.png 3x"
+                        width="256"
+                        height="192"
+                        alt="Flag"
+                        class="img-fluid">
+                `;
+            }
+
+            // Process the user's guess
+            function submitGuess() {
+                if (!countryInput.value.trim()) return;
+                
+                const userGuess = countryInput.value.trim();
+                const correctAnswer = currentCountry.name;
+                
+                // Check if the guess is a valid country name
+                if (!validCountries.includes(userGuess.toLowerCase())) {
+                    feedback.innerHTML = `<div class="alert alert-warning">Please enter a valid country name.</div>`;
+                    countryInput.value = '';
+                    countryInput.focus();
+                    return;
+                }
+                
+                if (userGuess.toLowerCase() === correctAnswer.toLowerCase()) {
+                    // Correct guess - don't increment guess count
+                    feedback.innerHTML = `<div class="alert alert-success">Correct! The answer is ${correctAnswer}.</div>`;
+                    countryInput.disabled = true;
+                    guessButton.disabled = true;
+                    nextButton.classList.remove('d-none');
+                } else {
+                    // Incorrect guess - increment guess count
+                    guessCount++;
+                    currentGuessSpan.textContent = Math.min(guessCount + 1, maxGuesses);
+                    
+                    if (guessCount >= maxGuesses) {
+                        // Out of guesses
+                        feedback.innerHTML = `<div class="alert alert-danger">Sorry, you're out of guesses. The correct answer is ${correctAnswer}.</div>`;
+                        countryInput.disabled = true;
+                        guessButton.disabled = true;
+                        nextButton.classList.remove('d-none');
+                    } else {
+                        // Still have guesses
+                        feedback.innerHTML = `<div class="alert alert-warning">Incorrect guess. Try again. You have ${maxGuesses - guessCount} guesses left.</div>`;
+                        countryInput.value = '';
+                        countryInput.focus();
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html> 
