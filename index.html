@@ -367,16 +367,28 @@
 
             // Display the flag image
             function displayFlag(countryCode) {
+                // Use Flag API that supports CORS - Flagpedia.net
                 flagContainer.innerHTML = `
                     <img 
-                        src="https://flagcdn.com/256x192/${countryCode}.png"
-                        srcset="https://flagcdn.com/512x384/${countryCode}.png 2x,
-                            https://flagcdn.com/768x576/${countryCode}.png 3x"
-                        width="256"
-                        height="192"
-                        alt="Flag"
-                        class="img-fluid">
+                        src="https://flagcdn.com/w320/${countryCode}.png"
+                        alt="Flag" 
+                        class="img-fluid"
+                        crossorigin="anonymous"
+                        onerror="this.onerror=null; this.src='https://flagcdn.com/h240/${countryCode}.png'; this.srcset='';"
+                    >
                 `;
+                
+                // Add error handling for image loading
+                const flagImg = flagContainer.querySelector('img');
+                flagImg.addEventListener('error', () => {
+                    // Fallback to alternate source if image fails to load
+                    flagContainer.innerHTML = `
+                        <div class="alert alert-warning">
+                            Image could not be loaded.<br>
+                            <a href="https://www.countryflags.io/${countryCode}/flat/64.png" target="_blank">View flag</a>
+                        </div>
+                    `;
+                });
             }
 
             // Process the user's guess
