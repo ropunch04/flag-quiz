@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flag Quiz Game</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <style>
         .game-screen {
             padding: 2rem;
@@ -72,9 +74,64 @@
             margin-bottom: 15px;
             font-weight: bold;
         }
+
+        .home-icon {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            font-size: 2rem;
+            color: #0d6efd;
+            cursor: pointer;
+            z-index: 1000;
+            transition: transform 0.2s;
+        }
+
+        .home-icon:hover {
+            transform: scale(1.1);
+            color: #0a58ca;
+        }
+
+        .btn-space {
+            margin: 0 5px;
+        }
+
+        .continent-card {
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 15px;
+            height: 100%;
+        }
+        
+        .continent-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .continent-card.selected {
+            border: 3px solid #0d6efd;
+            box-shadow: 0 5px 15px rgba(13, 110, 253, 0.3);
+        }
+        
+        .continent-count {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        .nav-tabs .nav-link {
+            cursor: pointer;
+        }
+        
+        .mode-content {
+            padding-top: 20px;
+        }
     </style>
 </head>
 <body>
+    <!-- Home Icon -->
+    <div class="home-icon" onclick="goHome()">
+        <i class="bi bi-globe-americas"></i>
+    </div>
+
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-8 text-center">
@@ -82,9 +139,95 @@
                 
                 <!-- Start Screen -->
                 <div id="start-screen" class="game-screen">
-                    <p class="lead mb-5">Test your knowledge of country flags!</p>
-                    <p>Try to guess all 196 countries in the world.</p>
-                    <button id="start-button" class="btn btn-primary btn-lg">Start Game</button>
+                    <p class="lead mb-4">Test your knowledge of country flags!</p>
+                    
+                    <!-- Quiz Mode Tabs -->
+                    <ul class="nav nav-tabs mb-4" id="quiz-mode-tabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="all-countries-tab" data-bs-toggle="tab" data-bs-target="#all-countries" type="button" role="tab" aria-controls="all-countries" aria-selected="true">All Countries</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="by-continent-tab" data-bs-toggle="tab" data-bs-target="#by-continent" type="button" role="tab" aria-controls="by-continent" aria-selected="false">By Continent</button>
+                        </li>
+                    </ul>
+                    
+                    <!-- Tab Content -->
+                    <div class="tab-content" id="quiz-mode-content">
+                        <!-- All Countries Tab -->
+                        <div class="tab-pane fade show active" id="all-countries" role="tabpanel" aria-labelledby="all-countries-tab">
+                            <p>Try to guess all 196 countries in the world.</p>
+                            <button id="start-all-button" class="btn btn-primary btn-lg">Start Full Quiz</button>
+                        </div>
+                        
+                        <!-- By Continent Tab -->
+                        <div class="tab-pane fade" id="by-continent" role="tabpanel" aria-labelledby="by-continent-tab">
+                            <p>Select a continent to focus your quiz:</p>
+                            
+                            <div class="row row-cols-1 row-cols-md-3 g-4 mb-4">
+                                <!-- Africa -->
+                                <div class="col">
+                                    <div class="card h-100 continent-card" data-continent="Africa">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Africa</h5>
+                                            <p class="continent-count" id="africa-count"></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Asia -->
+                                <div class="col">
+                                    <div class="card h-100 continent-card" data-continent="Asia">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Asia</h5>
+                                            <p class="continent-count" id="asia-count"></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Europe -->
+                                <div class="col">
+                                    <div class="card h-100 continent-card" data-continent="Europe">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Europe</h5>
+                                            <p class="continent-count" id="europe-count"></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- North America -->
+                                <div class="col">
+                                    <div class="card h-100 continent-card" data-continent="North America">
+                                        <div class="card-body">
+                                            <h5 class="card-title">North America</h5>
+                                            <p class="continent-count" id="north-america-count"></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- South America -->
+                                <div class="col">
+                                    <div class="card h-100 continent-card" data-continent="South America">
+                                        <div class="card-body">
+                                            <h5 class="card-title">South America</h5>
+                                            <p class="continent-count" id="south-america-count"></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Oceania -->
+                                <div class="col">
+                                    <div class="card h-100 continent-card" data-continent="Oceania">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Oceania</h5>
+                                            <p class="continent-count" id="oceania-count"></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button id="start-continent-button" class="btn btn-primary btn-lg" disabled>Start Continent Quiz</button>
+                        </div>
+                    </div>
                 </div>
                 
                 <!-- Game Screen -->
@@ -137,12 +280,12 @@
                 
                 <!-- Result Screen -->
                 <div id="result-screen" class="game-screen d-none">
-                    <div id="result-message" class="mb-4"></div>
-                    <div class="mb-4">
-                        <p>You correctly identified <span id="correct-count">0</span> out of 196 countries.</p>
-                        <p>Time taken: <span id="final-time">00:00</span></p>
+                    <div id="result-message"></div>
+                    <p>You correctly identified <span id="correct-count">0</span> flags in <span id="final-time">00:00</span>!</p>
+                    <div class="mt-4">
+                        <button id="play-again-button" class="btn btn-primary btn-lg btn-space">Play Again</button>
+                        <button onclick="goHome()" class="btn btn-secondary btn-lg btn-space">Back to Home</button>
                     </div>
-                    <button id="play-again-button" class="btn btn-primary">Play Again</button>
                 </div>
             </div>
         </div>
@@ -156,7 +299,7 @@
                 {"name": "Albania", "code": "al", "continent": "Europe", "information": "Kjo është pista juaj e dytë. Ky vend ka histori të pasur."},
                 {"name": "Algeria", "code": "dz", "continent": "Africa", "information": "هذه هي التلميحة الثانية لك. هذا البلد يحمل ارثًا ثقافيًا غنيًا."},
                 {"name": "Andorra", "code": "ad", "continent": "Europe", "information": "Aquesta és la teva segona pista. Aquest país és situat entre Espanya i França."},
-                {"name": "Angola", "code": "ao", "continent": "Africa", "information": "Esta é a sua segunda pista. Aqui se fala português e há paisagens exuberantes."},
+                {"name": "Angola", "code": "ao", "continent": "Africa", "information": "Esta é a sua segona pista. Aqui se fala português e há paisagens exuberantes."},
                 {"name": "Antigua and Barbuda", "code": "ag", "continent": "North America", "information": "This is your second hint. This island nation is famous for its 365 beaches."},
                 {"name": "Argentina", "code": "ar", "continent": "South America", "information": "Esta es tu segunda pista. Es famoso por el tango y el asado."},
                 {"name": "Armenia", "code": "am", "continent": "Asia", "information": "Խա ազգառս ե ձեք հայտնիքը: Այս երկիրը հայտնի է իր պատմությամբ։"},
@@ -354,7 +497,8 @@
             const startScreen = document.getElementById('start-screen');
             const gameScreen = document.getElementById('game-screen');
             const resultScreen = document.getElementById('result-screen');
-            const startButton = document.getElementById('start-button');
+            const startAllButton = document.getElementById('start-all-button');
+            const startContinentButton = document.getElementById('start-continent-button');
             const flagContainer = document.getElementById('flag-container');
             const countryInput = document.getElementById('country-input');
             const guessButton = document.getElementById('guess-button');
@@ -373,13 +517,7 @@
             const finalTimeSpan = document.getElementById('final-time');
             const hintContainer = document.getElementById('hint-container');
             const hintText = document.getElementById('hint-text');
-
-            // Populate country datalist
-            countries.forEach(country => {
-                const option = document.createElement('option');
-                option.value = country.name;
-                countryList.appendChild(option);
-            });
+            const continentCards = document.querySelectorAll('.continent-card');
 
             // Game state
             let currentCountry = null;
@@ -396,9 +534,67 @@
             let lastCountryCode = null; // Track the last country shown to avoid immediate repeats
             let resetButtonTimeout = null; // Timeout for reset button confirmation
             let giveUpButtonTimeout = null; // Timeout for give up button confirmation
+            let selectedContinent = null; // Currently selected continent for filtered quiz
+            let totalCountriesInQuiz = countries.length; // Total countries in the current quiz mode
+
+            // Initialize continent counts
+            function initializeContinentCounts() {
+                const continentCounts = {};
+                countries.forEach(country => {
+                    continentCounts[country.continent] = (continentCounts[country.continent] || 0) + 1;
+                });
+                
+                // Update the continent count displays
+                document.getElementById('africa-count').textContent = `${continentCounts['Africa'] || 0} countries`;
+                document.getElementById('asia-count').textContent = `${continentCounts['Asia'] || 0} countries`;
+                document.getElementById('europe-count').textContent = `${continentCounts['Europe'] || 0} countries`;
+                document.getElementById('north-america-count').textContent = `${continentCounts['North America'] || 0} countries`;
+                document.getElementById('south-america-count').textContent = `${continentCounts['South America'] || 0} countries`;
+                document.getElementById('oceania-count').textContent = `${continentCounts['Oceania'] || 0} countries`;
+            }
+            
+            // Call this on page load
+            initializeContinentCounts();
+
+            // Populate country datalist
+            countries.forEach(country => {
+                const option = document.createElement('option');
+                option.value = country.name;
+                countryList.appendChild(option);
+            });
 
             // Event listeners
-            startButton.addEventListener('click', startGame);
+            startAllButton.addEventListener('click', () => {
+                selectedContinent = null;
+                totalCountriesInQuiz = countries.length;
+                startGame();
+            });
+            
+            startContinentButton.addEventListener('click', () => {
+                if (selectedContinent) {
+                    const continentCountries = countries.filter(country => country.continent === selectedContinent);
+                    totalCountriesInQuiz = continentCountries.length;
+                    startGame();
+                }
+            });
+            
+            // Continent selection
+            continentCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    // Remove selection from all cards
+                    continentCards.forEach(c => c.classList.remove('selected'));
+                    
+                    // Add selection to clicked card
+                    card.classList.add('selected');
+                    
+                    // Store selected continent
+                    selectedContinent = card.dataset.continent;
+                    
+                    // Enable the start button
+                    startContinentButton.disabled = false;
+                });
+            });
+            
             guessButton.addEventListener('click', submitGuess);
             nextButton.addEventListener('click', loadNextFlag);
             playAgainButton.addEventListener('click', startGame);
@@ -447,7 +643,9 @@
             // Start the game
             function startGame() {
                 // Reset game state
-                remainingCountries = [...countries];
+                remainingCountries = selectedContinent 
+                    ? [...countries].filter(country => country.continent === selectedContinent)
+                    : [...countries];
                 missedCountries = [];
                 correctlyGuessedCount = 0;
                 flagsShownSinceMiss = minFlagsBetweenMissed; // Initialize to allow missed flags to show after reset
@@ -459,6 +657,13 @@
                 gameScreen.classList.remove('d-none');
                 hintContainer.classList.add('d-none');
                 updateProgressBar();
+                
+                // Update the progress text to reflect the current quiz mode
+                if (selectedContinent) {
+                    progressCount.textContent = `0/${totalCountriesInQuiz} countries in ${selectedContinent}`;
+                } else {
+                    progressCount.textContent = `0/${totalCountriesInQuiz} countries`;
+                }
                 
                 // Start timer
                 startTime = new Date();
@@ -672,11 +877,16 @@
 
             // Update the progress bar
             function updateProgressBar() {
-                const percentage = (correctlyGuessedCount / countries.length) * 100;
+                const percentage = (correctlyGuessedCount / totalCountriesInQuiz) * 100;
                 progressBar.style.width = `${percentage}%`;
                 progressBar.textContent = `${Math.round(percentage)}%`;
                 progressBar.setAttribute('aria-valuenow', percentage);
-                progressCount.textContent = `${correctlyGuessedCount}/${countries.length} countries`;
+                
+                if (selectedContinent) {
+                    progressCount.textContent = `${correctlyGuessedCount}/${totalCountriesInQuiz} countries in ${selectedContinent}`;
+                } else {
+                    progressCount.textContent = `${correctlyGuessedCount}/${totalCountriesInQuiz} countries`;
+                }
             }
 
             // Update the timer display
@@ -704,8 +914,21 @@
                     resetButton.classList.remove('btn-danger');
                     resetButton.classList.add('btn-warning');
                     
-                    // Perform the reset
-                    startGame();
+                    // Instead of starting the game again, go back to the start screen
+                    // Stop the timer
+                    if (timerInterval) {
+                        clearInterval(timerInterval);
+                    }
+                    
+                    // Show the start screen, hide game and result screens
+                    gameScreen.classList.add('d-none');
+                    resultScreen.classList.add('d-none');
+                    startScreen.classList.remove('d-none');
+                    
+                    // Reset continent selection
+                    continentCards.forEach(card => card.classList.remove('selected'));
+                    selectedContinent = null;
+                    startContinentButton.disabled = true;
                 } else {
                     // Set button to confirmation state
                     resetButton.textContent = 'Confirm Reset';
@@ -786,16 +1009,17 @@
                 
                 // Display appropriate message based on performance
                 let message = '';
-                const percentage = (correctlyGuessedCount / countries.length) * 100;
+                const percentage = (correctlyGuessedCount / totalCountriesInQuiz) * 100;
+                const quizTypeText = selectedContinent ? ` in ${selectedContinent}` : '';
                 
                 if (percentage === 100) {
-                    message = `<div class="alert alert-success">Congratulations! You correctly identified all countries in ${timeString}!</div>`;
+                    message = `<div class="alert alert-success">Congratulations! You correctly identified all countries${quizTypeText} in ${timeString}!</div>`;
                 } else if (percentage >= 80) {
-                    message = `<div class="alert alert-success">Great job! You identified ${correctlyGuessedCount} out of ${countries.length} countries in ${timeString}.</div>`;
+                    message = `<div class="alert alert-success">Great job! You identified ${correctlyGuessedCount} out of ${totalCountriesInQuiz} countries${quizTypeText} in ${timeString}.</div>`;
                 } else if (percentage >= 50) {
-                    message = `<div class="alert alert-warning">Not bad! You identified ${correctlyGuessedCount} out of ${countries.length} countries in ${timeString}.</div>`;
+                    message = `<div class="alert alert-warning">Not bad! You identified ${correctlyGuessedCount} out of ${totalCountriesInQuiz} countries${quizTypeText} in ${timeString}.</div>`;
                 } else {
-                    message = `<div class="alert alert-info">You identified ${correctlyGuessedCount} out of ${countries.length} countries in ${timeString}. Keep practicing!</div>`;
+                    message = `<div class="alert alert-info">You identified ${correctlyGuessedCount} out of ${totalCountriesInQuiz} countries${quizTypeText} in ${timeString}. Keep practicing!</div>`;
                 }
                 
                 resultMessage.innerHTML = message;
@@ -804,6 +1028,52 @@
                 gameScreen.classList.add('d-none');
                 resultScreen.classList.remove('d-none');
             }
+
+            // Add goHome function
+            window.goHome = function() {
+                // Stop any running timer
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                }
+                
+                // Reset game state
+                remainingCountries = [...countries];
+                missedCountries = [];
+                correctlyGuessedCount = 0;
+                flagsShownSinceMiss = minFlagsBetweenMissed;
+                lastCountryCode = null;
+                
+                // Reset continent selection
+                continentCards.forEach(card => card.classList.remove('selected'));
+                selectedContinent = null;
+                startContinentButton.disabled = true;
+                
+                // Show start screen, hide others
+                gameScreen.classList.add('d-none');
+                resultScreen.classList.add('d-none');
+                startScreen.classList.remove('d-none');
+                
+                // Reset any button states
+                if (resetButton.dataset.confirming === 'true') {
+                    resetButton.textContent = 'Reset Game';
+                    resetButton.dataset.confirming = 'false';
+                    resetButton.classList.remove('btn-danger');
+                    resetButton.classList.add('btn-warning');
+                    if (resetButtonTimeout) {
+                        clearTimeout(resetButtonTimeout);
+                        resetButtonTimeout = null;
+                    }
+                }
+                
+                if (giveUpButton.dataset.confirming === 'true') {
+                    giveUpButton.textContent = 'Give Up';
+                    giveUpButton.dataset.confirming = 'false';
+                    if (giveUpButtonTimeout) {
+                        clearTimeout(giveUpButtonTimeout);
+                        giveUpButtonTimeout = null;
+                    }
+                }
+            };
         });
     </script>
 </body>
