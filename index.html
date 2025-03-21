@@ -58,27 +58,40 @@
         }
 
         .suggestion-text {
+            text-align: left;
             position: absolute;
-            left: 0;
+            left: 0.75rem;  /* Match Bootstrap's default input padding */
             top: 0;
-            color: #999;
+            color: #6c757d;  /* Bootstrap's secondary color */
             pointer-events: none;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             width: 100%;
-            padding: 0.375rem 0.75rem;
+            padding: 0.375rem 0;  /* Keep vertical padding, remove horizontal */
             border: 1px solid transparent;
             background: transparent;
             font-size: 1.2rem;
             z-index: 1;
         }
 
+        .suggestion-text .typed {
+            color: #000;
+            visibility: hidden;
+        }
+
+        .suggestion-text .suggestion {
+            color: #999;
+        }
+
         #country-input {
             position: relative;
             z-index: 2;
-            background: transparent;
+            background: transparent !important;
+            color: #000;
             width: 100%;
+            font-size: 1.2rem;
+            caret-color: #000;
         }
 
         #feedback {
@@ -164,20 +177,23 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            flex-direction: row;
         }
 
         .input-wrapper {
             position: relative;
             display: flex;
             align-items: center;
-            width: 100%;
+            flex: 1;
         }
 
         #guess-button {
+            border-radius: 0.25rem;
             min-width: 80px;
             padding: 0.375rem 1rem;
             font-size: 1rem;
             white-space: nowrap;
+            flex-shrink: 0;
         }
     </style>
 </head>
@@ -315,7 +331,12 @@
                         <div class="input-group mb-3">
                             <div class="input-wrapper">
                                 <div id="suggestion-text" class="suggestion-text"></div>
-                                <input type="text" id="country-input" class="form-control" placeholder="Type a country name" list="country-list" autocomplete="off">
+                                <input type="text" 
+                                    id="country-input" 
+                                    class="form-control" 
+                                    placeholder="Type a country name" 
+                                    autocomplete="off"
+                                    autofocus>
                             </div>
                             <button id="guess-button" class="btn btn-primary">Guess</button>
                         </div>
@@ -723,13 +744,19 @@
                     progressCount.textContent = `0/${totalCountriesInQuiz} countries`;
                 }
                 
-                // Start timer
-                startTime = new Date();
+                // Reset and start timer
                 if (timerInterval) clearInterval(timerInterval);
+                timerElement.textContent = 'Time: 00:00'; // Reset timer display
+                startTime = new Date();
                 timerInterval = setInterval(updateTimer, 1000);
                 
                 // Load first flag
                 loadNextFlag();
+                
+                // Focus the input field after a short delay to ensure the screen is visible
+                setTimeout(() => {
+                    countryInput.focus();
+                }, 100);
             }
 
             // Load a new flag
@@ -767,6 +794,11 @@
                 // Enable guess controls
                 countryInput.disabled = false;
                 guessButton.disabled = false;
+                
+                // Focus the input field
+                setTimeout(() => {
+                    countryInput.focus();
+                }, 100);
                 
                 // Increment the counter for flags shown since last missed flag
                 flagsShownSinceMiss++;
@@ -1135,38 +1167,56 @@
 
             // Add autocomplete functionality
             countryInput.addEventListener('input', () => {
-                const inputValue = countryInput.value.toLowerCase();
+                const inputValue = countryInput.value;
+                const suggestionText = document.getElementById('suggestion-text');
+                
                 if (!inputValue) {
                     suggestionText.textContent = '';
                     return;
                 }
 
-                // Find the first country that starts with the input
+                // Find the first country that starts with the input (case insensitive)
                 const suggestion = countries.find(country => 
-                    country.name.toLowerCase().startsWith(inputValue)
+                    country.name.toLowerCase().startsWith(inputValue.toLowerCase())
                 );
 
                 if (suggestion) {
-                    // Show the suggestion as gray text
-                    suggestionText.textContent = suggestion.name;
+                    // Keep the case of what user typed, then use suggestion's case for the rest
+                    const matchingPart = suggestion.name.slice(0, inputValue.length);
+                    const preservedCaseStart = inputValue + suggestion.name.slice(inputValue.length);
+                    suggestionText.textContent = preservedCaseStart;
                 } else {
                     suggestionText.textContent = '';
                 }
             });
 
-            // Handle Enter key to submit suggestion
+            // Handle Tab key to complete suggestion
             countryInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    const inputValue = countryInput.value.toLowerCase();
+                if (e.key === 'Tab' && !e.shiftKey) {
+                    const suggestionText = document.getElementById('suggestion-text');
+                    if (suggestionText.textContent.trim()) {
+                        e.preventDefault();
+                        const inputValue = countryInput.value;
+                        const suggestion = countries.find(country => 
+                            country.name.toLowerCase().startsWith(inputValue.toLowerCase())
+                        );
+                        if (suggestion) {
+                            countryInput.value = suggestion.name;
+                            suggestionText.textContent = '';
+                        }
+                    }
+                } else if (e.key === 'Enter') {
+                    const inputValue = countryInput.value;
                     const suggestion = countries.find(country => 
-                        country.name.toLowerCase().startsWith(inputValue)
+                        country.name.toLowerCase().startsWith(inputValue.toLowerCase())
                     );
 
                     if (suggestion) {
-                        // Set the input value to the full suggestion
-                        countryInput.value = suggestion.name;
+                        // Keep the case of what user typed, then use suggestion's case for the rest
+                        const preservedCaseStart = inputValue + suggestion.name.slice(inputValue.length);
+                        countryInput.value = preservedCaseStart;
                         // Clear the suggestion text
-                        suggestionText.textContent = '';
+                        document.getElementById('suggestion-text').textContent = '';
                         // Submit the guess
                         submitGuess();
                     } else {
