@@ -903,7 +903,9 @@
 
             // Process the user's guess
             function submitGuess() {
-                if (!countryInput.value.trim()) return;
+                if (!countryInput.value.trim()) {
+                    return;
+                }
                 
                 const userGuess = countryInput.value.trim();
                 const correctAnswer = currentCountry.name;
@@ -932,7 +934,7 @@
                         endGame();
                     }
                 } else {
-                    // Incorrect guess - increment guess count
+                    // Only increment guess count for actual incorrect guesses
                     guessCount++;
                     currentGuessSpan.textContent = Math.min(guessCount + 1, maxGuesses);
                     
@@ -1206,7 +1208,11 @@
                         }
                     }
                 } else if (e.key === 'Enter') {
-                    const inputValue = countryInput.value;
+                    const inputValue = countryInput.value.trim();
+                    if (!inputValue) {
+                        return; // Don't submit empty guesses
+                    }
+
                     const suggestion = countries.find(country => 
                         country.name.toLowerCase().startsWith(inputValue.toLowerCase())
                     );
