@@ -35,7 +35,7 @@ def parse_category_page(html, category, url):
     soup = BeautifulSoup(html, "html.parser")
     results = []
 
-    if category.startswith('signs_'):
+    if category == 'signs':
         # Special handling for signs pages which group by country
         countries = soup.find_all("span", class_="font-bold text-xl mt-4")
         for country_elem in countries:
@@ -117,8 +117,9 @@ def scrape_google_vehicles():
             print(f"🔍 Scraping googleVehicles/{subcat} → {url}")
             res = requests.get(url, headers=HEADERS, timeout=30)
             res.raise_for_status()
-            results = parse_category_page(res.text, f"googleVehicles_{subcat}", url)
+            results = parse_category_page(res.text, "googleVehicles", url)
             all_results.extend(results)
+            time.sleep(1)  # Add 1 second delay between requests
         except Exception as e:
             print(f"❌ Failed to scrape googleVehicles/{subcat}: {e}")
     return all_results
@@ -131,8 +132,9 @@ def scrape_signs():
             print(f"🔍 Scraping signs/{subcat} → {url}")
             res = requests.get(url, headers=HEADERS, timeout=30)
             res.raise_for_status()
-            results = parse_category_page(res.text, f"signs_{subcat}", url)
+            results = parse_category_page(res.text, "signs", url)
             all_results.extend(results)
+            time.sleep(1)  # Add 1 second delay between requests
         except Exception as e:
             print(f"❌ Failed to scrape signs/{subcat}: {e}")
     return all_results
