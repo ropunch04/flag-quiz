@@ -1,0 +1,192 @@
+.game-screen {
+    padding: 2rem;
+    border-radius: 10px;
+    background-color: #f8f9fa;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+#flag-container {
+    min-height: 240px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#flag-container img {
+    max-width: 100%;
+    max-height: 240px;
+    border: 1px solid #ddd;
+}
+
+#quiz-container {
+    min-height: 240px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+#quiz-container img {
+    max-width: 100%;
+    max-height: 400px;
+    object-fit: contain;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.correct {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.incorrect {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+.result {
+    color: #17a2b8;
+    font-weight: bold;
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+#country-input {
+    position: relative;
+    z-index: 2;
+    background: transparent !important;
+    width: 100%;
+    font-size: 1.2rem;
+    padding: 0.375rem 0.75rem;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    line-height: 1.5;
+}
+
+.suggestion-text {
+    text-align: left;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    font-size: 1.2rem;
+    padding: 0.375rem 0.75rem;
+    border: 1px solid transparent;
+    border-radius: 0.25rem;
+    line-height: 1.5;
+    color: #999;
+    pointer-events: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    z-index: 1;
+}
+
+#feedback {
+    min-height: 30px;
+}
+
+#timer {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #17a2b8;
+}
+
+.game-controls {
+    margin-top: 20px;
+}
+
+.progress {
+    height: 25px;
+    margin-bottom: 15px;
+}
+
+#hint-container {
+    padding: 10px;
+    background-color: #f0f8ff;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+.home-icon {
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    font-size: 2rem;
+    color: #0d6efd;
+    cursor: pointer;
+    z-index: 1000;
+    transition: transform 0.2s;
+}
+
+.home-icon:hover {
+    transform: scale(1.1);
+    color: #0a58ca;
+}
+
+.btn-space {
+    margin: 0 5px;
+}
+
+.continent-card {
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    margin-bottom: 15px;
+    height: 100%;
+}
+
+.continent-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.continent-card.selected {
+    border: 3px solid #0d6efd;
+    box-shadow: 0 5px 15px rgba(13, 110, 253, 0.3);
+}
+
+.continent-count {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.nav-tabs .nav-link {
+    cursor: pointer;
+}
+
+.mode-content {
+    padding-top: 20px;
+}
+
+.input-group {
+    max-width: 600px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-direction: row;
+}
+
+#guess-button {
+    border-radius: 0.25rem;
+    min-width: 80px;
+    padding: 0.375rem 1rem;
+    font-size: 1rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.suggestion-text .typed {
+    display: none;
+}
+
+.suggestion-text .suggestion {
+    color: #999;
+} 
